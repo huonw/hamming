@@ -1,0 +1,11 @@
+[package]
+name = "hamming"
+version = "0.1.0"
+authors = ["Huon Wilson <dbau.pp@gmail.com>"]
+
+[features]
+unstable = []
+
+[dev-dependencies]
+quickcheck = "0.2"
+rand = "0.3"

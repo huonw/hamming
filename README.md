@@ -4,7 +4,9 @@
 
 A crate to compute the
 [Hamming weight](https://en.wikipedia.org/wiki/Hamming_weight) of a
-vector efficiently.
+vector and the
+[Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
+between two efficiently.
 
 [Documentation](http://huonw.github.io/hamming/hamming),
 [crates.io](https://crates.io/crates/hamming).

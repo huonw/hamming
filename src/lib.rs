@@ -1,4 +1,5 @@
-//! A crate to count ones, fast (aka popcount, hamming weight).
+//! A crate to count ones and xor bytes, fast (aka popcount, hamming
+//! weight and hamming distance).
 //!
 //! # Installation
 //!
@@ -13,6 +14,7 @@
 //!
 //! ```rust
 //! assert_eq!(hamming::weight(&[1, 0xFF, 1, 0xFF]), 1 + 8 + 1 + 8);
+//! assert_eq!(hamming::distance(&[1, 0xFF], &[0xFF, 1]), 7 + 7);
 //! ```
 
 #![cfg_attr(all(test, feature = "unstable"), feature(test))]
@@ -22,3 +24,6 @@
 
 mod weight_;
 pub use weight_::weight;
+
+mod distance_;
+pub use distance_::{distance, distance_fast};

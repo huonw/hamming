@@ -3,6 +3,18 @@ name = "hamming"
 version = "0.1.0"
 authors = ["Huon Wilson <dbau.pp@gmail.com>"]
 
+license = "MIT/Apache-2.0"
+keywords = ["popcount", "hamming", "bithack"]
+homepage = "https://github.com/huonw/hamming"
+repository = "https://github.com/huonw/hamming"
+documentation = "http://huonw.github.io/hamming/hamming/"
+
+description = """
+Count ones, fast (aka popcount, hamming weight). This provides a
+performance popcount for a slice of bytes.
+"""
+
+
 [features]
 unstable = []
 

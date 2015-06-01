@@ -110,13 +110,17 @@ mod tests {
     }
     #[test]
     fn weight_qc() {
-        fn prop(v: Vec<u8>, misalign: u8) -> bool {
-            let data = &v[misalign as usize..];
-            super::weight(data) == super::naive(data)
+        fn prop(v: Vec<u8>, misalign: u8) -> qc::TestResult {
+            let misalign = misalign as usize % 16;
+            if misalign > v.len() {
+                return qc::TestResult::discard();
+            }
+            let data = &v[misalign..];
+            qc::TestResult::from_bool(super::weight(data) == super::naive(data))
         }
         qc::QuickCheck::new()
             .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
-            .quickcheck(prop as fn(Vec<u8>,u8) -> bool)
+            .quickcheck(prop as fn(Vec<u8>,u8) -> qc::TestResult)
     }
     #[test]
     fn weight_huge() {

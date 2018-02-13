@@ -14,9 +14,12 @@ Count ones, fast (aka popcount, hamming weight). This provides a
 performant popcount and bitwise hamming distance for a slice of bytes.
 """
 
-
 [features]
 unstable = []
+simd = ["faster"]
+
+[dependencies]
+faster = { git = "https://github.com/AdamNiederer/faster", branch = "master", optional = true }
 
 [dev-dependencies]
 quickcheck = "0.2"

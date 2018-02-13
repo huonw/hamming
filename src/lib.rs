@@ -21,6 +21,7 @@
 #[cfg(test)] extern crate quickcheck;
 #[cfg(test)] extern crate rand;
 #[cfg(all(test, feature = "unstable"))] extern crate test;
+#[cfg(feature = "simd")] extern crate faster;
 
 mod weight_;
 pub use weight_::weight;

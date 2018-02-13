@@ -5,6 +5,25 @@ fn naive(x: &[u8], y: &[u8]) -> u64 {
     x.iter().zip(y).fold(0, |a, (b, c)| a + (*b ^ *c).count_ones() as u64)
 }
 
+/// Computes the bitwise [Hamming
+/// distance](https://en.wikipedia.org/wiki/Hamming_distance) between
+/// `x` and `y`, that is, the number of bits where `x` and `y` differ,
+/// or, the number of set bits in the xor of `x` and `y`.
+///
+/// This is a SIMD-enabled version, which performs significantly better than the
+/// optimized version on large workloads. Without SIMD, it's slightly more
+/// performant than the naiive algorithm.
+#[cfg(feature = "simd")]
+pub fn distance_simd(x: &[u8], y: &[u8]) -> u64 {
+    use faster::*;
+
+    assert_eq!(x.len(), y.len());
+
+    (x.simd_iter(u8s(0)), y.simd_iter(u8s(0))).zip()
+        .simd_reduce(0, |acc, (a, b)| acc + (a ^ b).count_ones()) as u64
+
+}
+
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd, Hash, Clone)]
 pub struct DistanceError {
     _x: ()
@@ -253,11 +272,29 @@ mod tests {
             }
         }
     }
+    #[test]
+    #[cfg(feature = "simd")]
+    fn distance_simd_smoke() {
+        let v = vec![0b0000_0000; 10234567];
+        let w = vec![0b1111_1111; v.len()];
+        let x = vec![0b0000_1111; 10234567];
+        let y = vec![0b1100_0000; 10234567];
+        let z = vec![0b0011_0000; 10234567];
+
+
+        assert_eq!(super::distance_simd(&v, &v), 0);
+        assert_eq!(super::distance_simd(&w, &w), 0);
+        assert_eq!(super::distance_simd(&v, &w), 8 * w.len() as u64);
+        assert_eq!(super::distance_simd(&v, &x), 4 * w.len() as u64);
+        assert_eq!(super::distance_simd(&v, &y), 2 * w.len() as u64);
+        assert_eq!(super::distance_simd(&v, &z), 2 * w.len() as u64);
+    }
 }
 
 #[cfg(all(test, feature = "unstable"))]
 mod benches {
     use test;
+
     fn bench<F: FnMut(&[u8], &[u8]) -> u64>(b: &mut test::Bencher, n: usize, mut f: F) {
         let data = vec![0xFF; n];
         b.iter(|| {
@@ -266,6 +303,7 @@ mod benches {
             f(d1, d2)
         })
     }
+
     macro_rules! test_mod {
         ($name: ident) => {
             mod $name {
@@ -291,4 +329,6 @@ mod benches {
     }
     test_mod!(naive);
     test_mod!(distance_);
+    #[cfg(feature = "simd")]
+    test_mod!(distance_simd);
 }

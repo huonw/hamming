@@ -3,9 +3,23 @@ use std::{slice, mem};
 fn naive(x: &[u8]) -> u64 {
     x.iter().fold(0, |a, b| a + b.count_ones() as u64)
 }
+
 /// Computes the [Hamming
 /// weight](https://en.wikipedia.org/wiki/Hamming_weight) of `x`, that
-/// is, the population count, or number of 1.
+/// is, the population count, or number of 1s.
+///
+/// This is a SIMD-enabled version, which performs significantly better than the
+/// optimized version on large workloads. Without SIMD, it's slightly more
+/// performant than the naiive algorithm.
+#[cfg(feature = "simd")]
+pub fn weight_simd(x: &[u8]) -> u64 {
+    use faster::*;
+    x.simd_iter(u8s(0)).simd_reduce(0, |acc, a| acc + a.count_ones()) as u64
+}
+
+/// Computes the [Hamming
+/// weight](https://en.wikipedia.org/wiki/Hamming_weight) of `x`, that
+/// is, the population count, or number of 1s.
 ///
 /// This is a highly optimised version of the following naive version:
 ///
@@ -109,6 +123,18 @@ mod tests {
         }
     }
     #[test]
+    #[cfg(feature = "simd")]
+    fn simd_smoke() {
+        let tests = [(&[0u8] as &[u8], 0),
+                     (&[1], 1),
+                     (&[0xFF], 8),
+                     (&[0xFF; 10], 8 * 10),
+                     (&[1; 1000], 1000)];
+        for &(v, expected) in &tests {
+            assert_eq!(super::weight_simd(v), expected);
+        }
+    }
+    #[test]
     fn weight_qc() {
         fn prop(v: Vec<u8>, misalign: u8) -> qc::TestResult {
             let misalign = misalign as usize % 16;
@@ -162,4 +188,6 @@ mod benches {
     }
     test_mod!(naive);
     test_mod!(weight);
+    #[cfg(feature = "simd")]
+    test_mod!(weight_simd);
 }

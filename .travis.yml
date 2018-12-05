@@ -1,24 +1,45 @@
 language: rust
-rust:
-  - nightly
-  - beta
-  - 1.0.0
-sudo: required
+
+matrix:
+  include:
+      - rust: nightly
+        env: UNSTABLE=1
+
+      - rust: nightly
+        services: docker
+        env: TARGET=i686-unknown-linux-gnu UNSTABLE=1
+        sudo: required
+        addons:
+          apt:
+            packages:
+              - gcc-multilib
+
+      - rust: beta
+
+      - rust: 1.13.0
+
+      - rust: stable
+        services: docker
+        env: TARGET=mips64-unknown-linux-gnuabi64
+        sudo: required
+
+      - rust: stable
+        env: COVERAGE=1
+        sudo: required
+
+cache: cargo
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
 
 before_script:
-  - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
-script:
-  - |
-      travis-cargo build &&
-      travis-cargo test &&
-      travis-cargo bench &&
-      travis-cargo doc
-after_success:
-  - travis-cargo --only 1.0.0 doc-upload
-  - travis-cargo coveralls
+  - export PATH=$HOME/.cargo/bin:$PATH
 
-env:
-  global:
-    secure: "RQUwwoXadb3+vlNuHVYxgxK8VXGy57guFBYfk249qP8HGdaKks2ngEBTR5CDMfnBR37uzM6JPZgJwIhR/+xN6mQLa0ulxFQ5WZsM5NQ4uV2GJPbBEXcmacGMAaWI5I1+vNH8pVSzlxmj94CRzsgXJPVmpCFJN5ngRAzlwCgg/EOUw5bZ4DzPHW+2Eg+LEY3Vxj/Heq/9Sx1Wq2BNtI+xMCwE88MXeWkudzMuHCSE5nZL6pUj+6bsQDWYMmphIj3hp3RkXYnKurFJAPvTxMyBnGsHSDJ6mTclH19aCV9ulOxj4iLqn+XaDmuqAKxolLBvSvH1amiiiiyketgqnaNdczVkouOOx+8aQXGKDem6jtVcya+n5kqYk7++XDLuyoEAVBgsTpbHhQ5ptI+Gx+xJ0JbrC1/5aNX0YfxOabFKYBiKhQv8gx0shgE69h646S/LOg/qngoAWgiCbtg4EH++cAYrOw7NX1lfhvgOdEraKHwR95W1TURPtAzxq8mD0VV78sY+obcuxWLhnY7x4jWyaMec/XvmXQTUlyVv/7G+qldwqLs6YG5jeiPkDeM1iok3yXCZQ3ZdwEdlE1gsbD2jPjieq9anYAXBBtnpM+mBo+XLoDT7gYF+d4k8/J7BeKHZSI9jZgLNX2hSfWAOy0xQGrZ50Yg9RJeFZab7a+UscCc="
+script:
+  - ci/script.sh
+
 notifications:
   webhooks: http://huon.me:54856/travis

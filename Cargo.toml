@@ -7,7 +7,7 @@ license = "MIT/Apache-2.0"
 keywords = ["popcount", "hamming", "bithack"]
 homepage = "https://github.com/huonw/hamming"
 repository = "https://github.com/huonw/hamming"
-documentation = "http://huonw.github.io/hamming/hamming/"
+documentation = "https://docs.rs/hamming/"
 
 description = """
 Count ones, fast (aka popcount, hamming weight). This provides a

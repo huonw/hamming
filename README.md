@@ -8,5 +8,5 @@ vector and the
 [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
 between two efficiently.
 
-[Documentation](http://huonw.github.io/hamming/hamming),
+[Documentation](http://docs.rs/hamming),
 [crates.io](https://crates.io/crates/hamming).

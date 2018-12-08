@@ -189,11 +189,6 @@ pub fn distance(x: &[u8], y: &[u8]) -> u64 {
         .unwrap_or_else(|| naive(x, y))
 }
 
-#[cfg(all(test, feature = "unstable"))]
-fn distance_(x: &[u8], y: &[u8]) -> u64 {
-    distance_fast(x, y).unwrap()
-}
-
 #[cfg(test)]
 mod tests {
     use quickcheck as qc;
@@ -253,42 +248,4 @@ mod tests {
             }
         }
     }
-}
-
-#[cfg(all(test, feature = "unstable"))]
-mod benches {
-    use test;
-    fn bench<F: FnMut(&[u8], &[u8]) -> u64>(b: &mut test::Bencher, n: usize, mut f: F) {
-        let data = vec![0xFF; n];
-        b.iter(|| {
-            let d1 = test::black_box(&data);
-            let d2 = test::black_box(&data);
-            f(d1, d2)
-        })
-    }
-    macro_rules! test_mod {
-        ($name: ident) => {
-            mod $name {
-                use test;
-                use super::bench;
-                use super::super::$name;
-                #[bench]
-                fn _0000001(b: &mut test::Bencher) { bench(b, 1, $name) }
-                #[bench]
-                fn _0000010(b: &mut test::Bencher) { bench(b, 10, $name) }
-                #[bench]
-                fn _0000100(b: &mut test::Bencher) { bench(b, 100, $name) }
-                #[bench]
-                fn _0001000(b: &mut test::Bencher) { bench(b, 1000, $name) }
-                #[bench]
-                fn _0010000(b: &mut test::Bencher) { bench(b, 10000, $name) }
-                #[bench]
-                fn _0100000(b: &mut test::Bencher) { bench(b, 100000, $name) }
-                #[bench]
-                fn _1000000(b: &mut test::Bencher) { bench(b, 1000000, $name) }
-            }
-        }
-    }
-    test_mod!(naive);
-    test_mod!(distance_);
 }

@@ -21,3 +21,8 @@ unstable = []
 [dev-dependencies]
 quickcheck = "0.2"
 rand = "0.3"
+criterion = "0.2"
+
+[[bench]]
+name = "benches"
+harness = false

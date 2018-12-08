@@ -129,37 +129,3 @@ mod tests {
                    v[0].count_ones() as u64 * v.len() as u64);
     }
 }
-
-#[cfg(all(test, feature = "unstable"))]
-mod benches {
-    use test;
-    fn bench<F: FnMut(&[u8]) -> u64>(b: &mut test::Bencher, n: usize, mut f: F) {
-        let data = vec![0xFF; n];
-        b.iter(|| f(test::black_box(&data)))
-    }
-    macro_rules! test_mod {
-        ($name: ident) => {
-            mod $name {
-                use test;
-                use super::bench;
-                use super::super::$name;
-                #[bench]
-                fn _0000001(b: &mut test::Bencher) { bench(b, 1, $name) }
-                #[bench]
-                fn _0000010(b: &mut test::Bencher) { bench(b, 10, $name) }
-                #[bench]
-                fn _0000100(b: &mut test::Bencher) { bench(b, 100, $name) }
-                #[bench]
-                fn _0001000(b: &mut test::Bencher) { bench(b, 1000, $name) }
-                #[bench]
-                fn _0010000(b: &mut test::Bencher) { bench(b, 10000, $name) }
-                #[bench]
-                fn _0100000(b: &mut test::Bencher) { bench(b, 100000, $name) }
-                #[bench]
-                fn _1000000(b: &mut test::Bencher) { bench(b, 1000000, $name) }
-            }
-        }
-    }
-    test_mod!(naive);
-    test_mod!(weight);
-}

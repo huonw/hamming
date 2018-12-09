@@ -37,5 +37,6 @@ if [ ! -z "$COVERAGE" ]; then
     fi
 
     cargo install -v cargo-travis || echo "cargo-travis already installed"
-    cargo coveralls -v --features "$features"
+    cargo coverage -v --features "$features" -m coverage-reports
+    bash <(curl -s https://codecov.io/bash) -c -X gcov -X coveragepy -s coverage-reports
 fi

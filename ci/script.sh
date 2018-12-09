@@ -36,6 +36,6 @@ if [ ! -z "$COVERAGE" ]; then
         exit 1
     fi
 
-    cargo install -v cargo-travis --force
+    cargo install -v cargo-travis || echo "cargo-travis already installed"
     cargo coveralls -v --features "$features"
 fi

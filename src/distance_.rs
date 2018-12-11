@@ -1,4 +1,4 @@
-use std::{mem, slice};
+use core::{mem, slice};
 
 fn naive(x: &[u8], y: &[u8]) -> u64 {
     assert_eq!(x.len(), y.len());

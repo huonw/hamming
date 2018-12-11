@@ -18,7 +18,9 @@
 //! ```
 
 #![deny(warnings)]
+#![cfg_attr(not(test), no_std)]
 
+#[cfg(test)] extern crate core;
 #[cfg(test)] extern crate quickcheck;
 #[cfg(test)] extern crate rand;
 

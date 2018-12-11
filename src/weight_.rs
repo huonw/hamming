@@ -1,4 +1,4 @@
-use std::{slice, mem};
+use core::{slice, mem};
 
 fn naive(x: &[u8]) -> u64 {
     x.iter().fold(0, |a, b| a + b.count_ones() as u64)

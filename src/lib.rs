@@ -29,3 +29,5 @@ pub use weight_::weight;
 
 mod distance_;
 pub use distance_::{distance, distance_fast};
+
+mod util;

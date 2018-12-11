@@ -1,5 +1,3 @@
-use core::{slice, mem};
-
 fn naive(x: &[u8]) -> u64 {
     x.iter().fold(0, |a, b| a + b.count_ones() as u64)
 }
@@ -45,27 +43,10 @@ pub fn weight(x: &[u8]) -> u64 {
     const M8: u64 = 0x00FF00FF00FF00FF;
 
     type T30 = [u64; 30];
-    let size = mem::size_of::<T30>();
-    let alignment = mem::align_of::<T30>();
-
-    let ptr = x.as_ptr() as usize;
-    // round up to the nearest multiple
-    let aligned = (ptr + alignment - 1) / alignment * alignment;
-    let distance = aligned - ptr;
-
-    // can't fit a single T30 in
-    if x.len() < size + distance {
-        return naive(x)
-    }
-
-    let (head, middle) = x.split_at(distance);
-
-    assert!(middle.as_ptr() as usize % alignment == 0);
-    let thirty = unsafe {
-        slice::from_raw_parts(middle.as_ptr() as *const T30,
-                              middle.len() / size)
+    let (head, thirty, tail) = unsafe {
+        ::util::align_to::<_, T30>(x)
     };
-    let tail = &middle[thirty.len() * size..];
+
     let mut count = naive(head) + naive(tail);
     for array in thirty {
         let mut acc = 0;

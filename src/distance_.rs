@@ -1,5 +1,3 @@
-use core::{mem, slice};
-
 fn naive(x: &[u8], y: &[u8]) -> u64 {
     assert_eq!(x.len(), y.len());
     x.iter().zip(y).fold(0, |a, (b, c)| a + (*b ^ *c).count_ones() as u64)
@@ -73,42 +71,23 @@ pub fn distance_fast(x: &[u8], y: &[u8]) -> Result<u64, DistanceError> {
     const M8: u64 = 0x00FF00FF00FF00FF;
 
     type T30 = [u64; 30];
-    let size = mem::size_of::<T30>();
-    let alignment = mem::align_of::<T30>();
-
-    let ptr1 = x.as_ptr() as usize;
-    let ptr2 = y.as_ptr() as usize;
-
-    // round up to the nearest multiple
-    let aligned1 = (ptr1 + alignment - 1) / alignment * alignment;
-    let aligned2 = (ptr2 + alignment - 1) / alignment * alignment;
-    let distance1 = aligned1 - ptr1;
-    let distance2 = aligned2 - ptr2;
 
     // can't fit a single T30 in
-    if x.len() < size + distance1 {
-        return Ok(naive(x, y))
-    }
+    let (head1, thirty1, tail1) = unsafe {
+        ::util::align_to::<_, T30>(x)
+    };
+    let (head2, thirty2, tail2) = unsafe {
+        ::util::align_to::<_, T30>(y)
+    };
 
-    if distance1 != distance2 {
+    if head1.len() != head2.len() {
+        // The arrays required different shift amounts, so we can't
+        // use aligned loads for both slices.
         return Err(DistanceError { _x: () });
     }
 
-    let (head1, middle1) = x.split_at(distance1);
-    let (head2, middle2) = y.split_at(distance2);
-
-    assert!(middle1.as_ptr() as usize % alignment == 0);
-    assert!(middle2.as_ptr() as usize % alignment == 0);
-    let (thirty1, thirty2) = unsafe {
-        (slice::from_raw_parts(middle1.as_ptr() as *const T30,
-                               middle1.len() / size),
-         slice::from_raw_parts(middle2.as_ptr() as *const T30,
-                               middle2.len() / size))
-    };
     debug_assert_eq!(thirty1.len(), thirty2.len());
 
-    let tail1 = &middle1[thirty1.len() * size..];
-    let tail2 = &middle2[thirty2.len() * size..];
     let mut count = naive(head1, head2) + naive(tail1, tail2);
     for (array1, array2) in thirty1.iter().zip(thirty2) {
         let mut acc = 0;

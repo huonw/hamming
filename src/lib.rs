@@ -17,6 +17,8 @@
 //! assert_eq!(hamming::distance(&[1, 0xFF], &[0xFF, 1]), 7 + 7);
 //! ```
 
+#![deny(warnings)]
+
 #[cfg(test)] extern crate quickcheck;
 #[cfg(test)] extern crate rand;
 

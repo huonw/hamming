@@ -171,7 +171,6 @@ pub fn distance(x: &[u8], y: &[u8]) -> u64 {
 #[cfg(test)]
 mod tests {
     use quickcheck as qc;
-    use rand;
     #[test]
     fn naive_smoke() {
         let tests: &[(&[u8], &[u8], u64)] = &[
@@ -202,7 +201,7 @@ mod tests {
             qc::TestResult::from_bool(super::distance_fast(x, y).unwrap() == super::naive(x, y))
         }
         qc::QuickCheck::new()
-            .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
+            .gen(qc::Gen::new(10_000))
             .quickcheck(prop as fn(Vec<u8>,Vec<u8>,u8) -> qc::TestResult)
     }
     #[test]

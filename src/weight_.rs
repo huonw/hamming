@@ -77,7 +77,6 @@ pub fn weight(x: &[u8]) -> u64 {
 #[cfg(test)]
 mod tests {
     use quickcheck as qc;
-    use rand;
     #[test]
     fn naive_smoke() {
         let tests = [(&[0u8] as &[u8], 0),
@@ -100,7 +99,7 @@ mod tests {
             qc::TestResult::from_bool(super::weight(data) == super::naive(data))
         }
         qc::QuickCheck::new()
-            .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
+            .gen(qc::Gen::new(10_000))
             .quickcheck(prop as fn(Vec<u8>,u8) -> qc::TestResult)
     }
     #[test]

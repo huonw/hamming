@@ -19,8 +19,7 @@ performant popcount and bitwise hamming distance for a slice of bytes.
 unstable = []
 
 [dev-dependencies]
-quickcheck = "0.2"
-rand = "0.3"
+quickcheck = "1.0"
 criterion = "0.2"
 
 [[bench]]

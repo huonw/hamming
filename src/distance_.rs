@@ -1,11 +1,13 @@
 fn naive(x: &[u8], y: &[u8]) -> u64 {
     assert_eq!(x.len(), y.len());
-    x.iter().zip(y).fold(0, |a, (b, c)| a + (*b ^ *c).count_ones() as u64)
+    x.iter()
+        .zip(y)
+        .fold(0, |a, (b, c)| a + (*b ^ *c).count_ones() as u64)
 }
 
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd, Hash, Clone)]
 pub struct DistanceError {
-    _x: ()
+    _x: (),
 }
 
 /// Computes the bitwise [Hamming
@@ -73,12 +75,8 @@ pub fn distance_fast(x: &[u8], y: &[u8]) -> Result<u64, DistanceError> {
     type T30 = [u64; 30];
 
     // can't fit a single T30 in
-    let (head1, thirty1, tail1) = unsafe {
-        ::util::align_to::<_, T30>(x)
-    };
-    let (head2, thirty2, tail2) = unsafe {
-        ::util::align_to::<_, T30>(y)
-    };
+    let (head1, thirty1, tail1) = unsafe { crate::util::align_to::<_, T30>(x) };
+    let (head2, thirty2, tail2) = unsafe { crate::util::align_to::<_, T30>(y) };
 
     if head1.len() != head2.len() {
         // The arrays required different shift amounts, so we can't
@@ -108,8 +106,8 @@ pub fn distance_fast(x: &[u8], y: &[u8]) -> Result<u64, DistanceError> {
             acc += (count1 & M4) + ((count1 >> 4) & M4);
         }
         acc = (acc & M8) + ((acc >> 8) & M8);
-        acc =  acc       +  (acc >> 16);
-        acc =  acc       +  (acc >> 32);
+        acc = acc + (acc >> 16);
+        acc = acc + (acc >> 32);
         count += acc & 0xFFFF;
     }
     Ok(count)
@@ -163,9 +161,7 @@ pub fn distance_fast(x: &[u8], y: &[u8]) -> Result<u64, DistanceError> {
 /// assert_eq!(hamming::distance(&x, &y), 8 * 1000);
 /// ```
 pub fn distance(x: &[u8], y: &[u8]) -> u64 {
-    distance_fast(x, y)
-        .ok()
-        .unwrap_or_else(|| naive(x, y))
+    distance_fast(x, y).ok().unwrap_or_else(|| naive(x, y))
 }
 
 #[cfg(test)]
@@ -184,7 +180,7 @@ mod tests {
             (&[0xFF; 10], &[0x0F; 10], 4 * 10),
             (&[0x3B; 10000], &[0x3B; 10000], 0),
             (&[0x77; 10000], &[0x3B; 10000], 3 * 10000),
-            ];
+        ];
         for &(x, y, expected) in tests {
             assert_eq!(super::naive(x, y), expected);
         }
@@ -194,7 +190,7 @@ mod tests {
         fn prop(v: Vec<u8>, w: Vec<u8>, misalign: u8) -> qc::TestResult {
             let l = ::std::cmp::min(v.len(), w.len());
             if l < misalign as usize {
-                return qc::TestResult::discard()
+                return qc::TestResult::discard();
             }
 
             let x = &v[misalign as usize..l];
@@ -203,7 +199,7 @@ mod tests {
         }
         qc::QuickCheck::new()
             .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
-            .quickcheck(prop as fn(Vec<u8>,Vec<u8>,u8) -> qc::TestResult)
+            .quickcheck(prop as fn(Vec<u8>, Vec<u8>, u8) -> qc::TestResult)
     }
     #[test]
     fn distance_fast_smoke_huge() {
@@ -221,8 +217,10 @@ mod tests {
             let len = len_ * 10;
             for i in 0..8 {
                 for j in 0..8 {
-                    assert_eq!(super::distance(&v[i..i+len], &w[j..j+len]),
-                               len as u64 * 8)
+                    assert_eq!(
+                        super::distance(&v[i..i + len], &w[j..j + len]),
+                        len as u64 * 8
+                    )
                 }
             }
         }

@@ -43,9 +43,7 @@ pub fn weight(x: &[u8]) -> u64 {
     const M8: u64 = 0x00FF00FF00FF00FF;
 
     type T30 = [u64; 30];
-    let (head, thirty, tail) = unsafe {
-        ::util::align_to::<_, T30>(x)
-    };
+    let (head, thirty, tail) = unsafe { crate::util::align_to::<_, T30>(x) };
 
     let mut count = naive(head) + naive(tail);
     for array in thirty {
@@ -67,8 +65,8 @@ pub fn weight(x: &[u8]) -> u64 {
             acc += (count1 & M4) + ((count1 >> 4) & M4);
         }
         acc = (acc & M8) + ((acc >> 8) & M8);
-        acc =  acc       +  (acc >> 16);
-        acc =  acc       +  (acc >> 32);
+        acc = acc + (acc >> 16);
+        acc = acc + (acc >> 32);
         count += acc & 0xFFFF;
     }
     count
@@ -80,11 +78,13 @@ mod tests {
     use rand;
     #[test]
     fn naive_smoke() {
-        let tests = [(&[0u8] as &[u8], 0),
-                     (&[1], 1),
-                     (&[0xFF], 8),
-                     (&[0xFF; 10], 8 * 10),
-                     (&[1; 1000], 1000)];
+        let tests = [
+            (&[0u8] as &[u8], 0),
+            (&[1], 1),
+            (&[0xFF], 8),
+            (&[0xFF; 10], 8 * 10),
+            (&[1; 1000], 1000),
+        ];
         for &(v, expected) in &tests {
             assert_eq!(super::naive(v), expected);
         }
@@ -101,12 +101,11 @@ mod tests {
         }
         qc::QuickCheck::new()
             .gen(qc::StdGen::new(rand::thread_rng(), 10_000))
-            .quickcheck(prop as fn(Vec<u8>,u8) -> qc::TestResult)
+            .quickcheck(prop as fn(Vec<u8>, u8) -> qc::TestResult)
     }
     #[test]
     fn weight_huge() {
         let v = vec![0b1001_1101; 10234567];
-        assert_eq!(super::weight(&v),
-                   v[0].count_ones() as u64 * v.len() as u64);
+        assert_eq!(super::weight(&v), v[0].count_ones() as u64 * v.len() as u64);
     }
 }

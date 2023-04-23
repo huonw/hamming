@@ -2,8 +2,8 @@
 name = "hamming"
 version = "0.1.2"
 authors = ["Huon Wilson <dbau.pp@gmail.com>"]
-
-license = "MIT/Apache-2.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
 keywords = ["popcount", "hamming", "bithack"]
 homepage = "https://github.com/huonw/hamming"
 repository = "https://github.com/huonw/hamming"
